@@ -66,7 +66,7 @@ FOREIGN KEY (course) REFERENCES Courses(code)
 CREATE TABLE Taken(
     student TEXT NOT NULL,
     course TEXT NOT NULL,
-    grade TEXT NOT NULL,
+    grade CHAR(1) NOT NULL,
     FOREIGN KEY (student) REFERENCES Students(idnr),
     FOREIGN KEY (course) REFERENCES Courses(code)
 );
