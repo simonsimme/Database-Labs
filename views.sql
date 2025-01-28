@@ -26,31 +26,28 @@ LEFT JOIN Courses ON Taken.course = Courses.code;
 
 CREATE VIEW FinishedCourses AS
 SELECT
-    Students.name,
+    Taken.student,
     Taken.course,
-    Courses.name AS coursecode,
+    Courses.courseName,
     Taken.grade,
     Courses.credits
-FROM Students
-INNER JOIN Taken ON Taken.student = Students.idnr
+FROM Taken
 LEFT JOIN Courses ON Courses.code = Taken.course;
 
 -- Returns (student, course, status)
 -- Question for TA how UNION orders the rows since not all regist then all waiting
 CREATE VIEW Registrations AS
 SELECT
-    Students.name,
+    Registered.student,
     Registered.course,
     'registered' AS status
 FROM Registered
-LEFT JOIN Students ON Registered.student = Students.idnr
 UNION
 SELECT
-    Students.name,
+    WaitingList.student,
     WaitingList.course,
     'waiting' AS status
-FROM WaitingList
-LEFT JOIN Students ON WaitingList.student = Students.idnr;
+FROM WaitingList;
 
 
 

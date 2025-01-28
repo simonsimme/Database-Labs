@@ -20,7 +20,7 @@ CREATE TABLE Branches
 CREATE TABLE Courses
 (
     code VARCHAR(6) PRIMARY KEY NOT NULL,
-    name VARCHAR(25) NOT NULL,
+    courseName VARCHAR(25) NOT NULL,
     credits FLOAT NOT NULL,
     department VARCHAR(10) NOT NULL
 );
