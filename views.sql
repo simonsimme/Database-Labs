@@ -32,7 +32,7 @@ SELECT
 FROM Taken
 LEFT JOIN Courses ON Courses.code = Taken.course;
 
--- Returns (student, course, status)
+-- (student, course, status)
 -- Question for TA how UNION orders the rows since not all regist then all waiting
 CREATE VIEW Registrations AS
 SELECT
@@ -47,7 +47,7 @@ SELECT
     'waiting' AS status
 FROM WaitingList;
 
--- Helper view for unreadmandatory courses (Student, course)
+-- (Student, course)
 CREATE VIEW UnreadMandatory AS
 (SELECT
     Students.idnr AS student,
@@ -78,11 +78,11 @@ WHERE EXISTS
 GROUP BY student;
 
 CREATE VIEW mandatoryLeft AS 
-SELECT student, COUNT(course) as mandatoryLeft
+SELECT student, COALESCE(COUNT(course),0) as mandatoryLeft
 FROM UnreadMandatory
 GROUP BY student;
 
--- student, credits, mandatory
+-- (student, credits, mandatory)
 CREATE VIEW firstThreeC AS 
 SELECT 
     Students.idnr,
@@ -93,14 +93,44 @@ LEFT JOIN totalCredits ON totalCredits.student = Students.idnr
 LEFT JOIN mandatoryLeft ON mandatoryLeft.student = Students.idnr;
 
 
--- Currently not working as intended!
-CREATE VIEW mathCredits AS 
+-- (student, mathCredits)
+CREATE VIEW mathCredits AS
 SELECT 
-    Taken.student as studentID,
-    COALESCE(SUM(PassedCourses.credits),0) as mathCredits
+    Taken.student AS studentID,
+    COALESCE(SUM(Courses.credits), 0) as mathCredits
 FROM Taken
-INNER JOIN PassedCourses ON PassedCourses.student = Taken.student
-WHERE EXISTS (SELECT 1 FROM Classified WHERE PassedCourses.course = Classified.course 
-AND 
-Classified.classification = 'math')
+INNER JOIN Courses ON Taken.course = Courses.code 
+INNER JOIN PassedCourses ON PassedCourses.student = Taken.student 
+AND PassedCourses.course = Courses.code
+LEFT JOIN Classified ON Courses.code = Classified.course 
+AND Classified.classification = 'math'
+WHERE Classified.classification IS NOT NULL
 GROUP BY studentID;
+
+-- (student, count(seminarcourses))
+CREATE VIEW seminarcourses AS
+SELECT 
+    Taken.student AS studentID,
+    COALESCE(COUNT(Courses.credits), 0) AS seminarcount
+FROM Taken
+INNER JOIN Courses ON Taken.course = Courses.code 
+INNER JOIN PassedCourses ON PassedCourses.student = Taken.student 
+AND PassedCourses.course = Courses.code
+LEFT JOIN Classified ON Courses.code = Classified.course 
+AND Classified.classification = 'seminar'
+WHERE Classified.classification IS NOT NULL
+GROUP BY studentID;
+
+CREATE VIEW PathToGraduation AS
+SELECT 
+    Students.idnr as student,
+    totalCredits.totalCredits,
+    mandatoryLeft.mandatoryLeft,
+    mathCredits.mathCredits,
+    seminarcourses.seminarcount
+FROM Students
+LEFT JOIN totalCredits ON totalCredits.student = Students.idnr
+LEFT JOIN mandatoryLeft ON mandatoryLeft.student = Students.idnr
+LEFT JOIN mathCredits ON mathCredits.studentID = Students.idnr
+LEFT JOIN seminarcourses ON seminarcourses.studentID = Students.idnr;
+
