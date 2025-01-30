@@ -59,7 +59,6 @@ SUM(c.credits) AS totalCredits,
 mb.course,
 SUM(cm.credits) AS mathCredits,
 COUNT(cs.course) AS seminarCourseCount,
-
 FROM
     Students s
     Courses c
@@ -73,4 +72,4 @@ FROM
     AND ts.grade != 'U'
     LEFT JOIN ts ON ts.course = cls.course
     LEFT JOIN Courses cs ON cs.course = ts.course
-    INNER JOIN 
+    --INNER JOIN 
