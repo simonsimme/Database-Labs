@@ -111,7 +111,7 @@ GROUP BY studentID;
 CREATE VIEW seminarcourses AS
 SELECT 
     Taken.student AS studentID,
-    COALESCE(COUNT(Courses.credits), 0) AS seminarcount
+    COUNT(Courses.credits) AS seminarcount
 FROM Taken
 INNER JOIN Courses ON Taken.course = Courses.code 
 INNER JOIN PassedCourses ON PassedCourses.student = Taken.student 
@@ -121,16 +121,35 @@ AND Classified.classification = 'seminar'
 WHERE Classified.classification IS NOT NULL
 GROUP BY studentID;
 
-CREATE VIEW PathToGraduation AS
+
+CREATE VIEW passedRecommended AS
 SELECT 
     Students.idnr as student,
-    totalCredits.totalCredits,
-    mandatoryLeft.mandatoryLeft,
-    mathCredits.mathCredits,
-    seminarcourses.seminarcount
+    COALESCE(SUM(PassedCourses.credits),0) as credits
+FROM Students
+INNER JOIN PassedCourses ON Students.idnr = PassedCourses.student
+LEFT JOIN RecommendedBranch on RecommendedBranch.course = PassedCourses.course
+LEFT JOIN StudentBranches ON Students.idnr = StudentBranches.student
+AND RecommendedBranch.program = StudentBranches.program
+WHERE RecommendedBranch IS NOT NULL AND RecommendedBranch.branch = StudentBranches.branch
+GROUP BY Students.idnr;
+
+CREATE VIEW PathToGraduation AS
+SELECT 
+    Students.idnr AS student,
+    COALESCE(totalCredits.totalCredits,0) AS totalCredits,
+    COALESCE(mandatoryLeft.mandatoryLeft,0) AS mandatoryLeft, 
+    COALESCE(mathCredits.mathCredits,0) AS mathCredits,
+    COALESCE(seminarcourses.seminarcount,0) as seminarcourses,
+    (totalCredits.totalCredits > 10) AND 
+    (passedRecommended.credits >= 10 AND passedRecommended.credits IS NOT NULL) AND 
+    (mandatoryLeft.mandatoryLeft = 0 OR mandatoryLeft.mandatoryLeft IS NULL) AND
+    (mathCredits.mathCredits >= 20 AND mathCredits.mathCredits IS NOT NULL) AND
+    (seminarcourses.seminarcount >= 1 AND seminarcourses.seminarcount IS NOT NULL) AS qualified
 FROM Students
 LEFT JOIN totalCredits ON totalCredits.student = Students.idnr
 LEFT JOIN mandatoryLeft ON mandatoryLeft.student = Students.idnr
 LEFT JOIN mathCredits ON mathCredits.studentID = Students.idnr
-LEFT JOIN seminarcourses ON seminarcourses.studentID = Students.idnr;
+LEFT JOIN seminarcourses ON seminarcourses.studentID = Students.idnr
+LEFT JOIN passedRecommended ON Students.idnr = passedRecommended.student;
 
