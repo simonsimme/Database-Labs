@@ -20,13 +20,13 @@ SELECT
 FROM Taken
 INNER JOIN Courses ON Taken.course = Courses.code AND Taken.grade != 'U';
 
--- Returns (Students, course, courseName, grade, credit)
+-- Returns (Students, course, course name, grade, credit)
 
 CREATE VIEW FinishedCourses AS
 SELECT
     Taken.student,
     Taken.course,
-    Courses.courseName,
+    Courses.name as courseName,
     Taken.grade,
     Courses.credits
 FROM Taken
@@ -69,13 +69,11 @@ FROM PassedCourses;
 
 CREATE VIEW totalCredits AS
 SELECT
-    Taken.student,
+    PassedCourses.student,
     COALESCE(SUM(Courses.credits), 0) AS totalCredits
-FROM Taken 
-LEFT JOIN Courses ON Taken.course = Courses.code
-WHERE EXISTS 
-(SELECT 1 FROM PassedCourses WHERE PassedCourses.student = Taken.student)
-GROUP BY student;
+FROM PassedCourses 
+JOIN Courses ON PassedCourses.course = Courses.code
+GROUP BY PassedCourses.student;
 
 CREATE VIEW mandatoryLeft AS 
 SELECT student, COALESCE(COUNT(course),0) as mandatoryLeft

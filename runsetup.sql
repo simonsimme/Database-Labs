@@ -52,7 +52,7 @@ SELECT idnr, name, login, program, branch
 FROM BasicInformation
 ORDER BY idnr;
 
-SELECT student, course, courseName, grade, credits
+SELECT student, course, coursename, grade, credits
 FROM FinishedCourses
 ORDER BY (student, course);
 
