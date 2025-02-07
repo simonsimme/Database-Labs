@@ -20,13 +20,13 @@ SELECT
 FROM Taken
 INNER JOIN Courses ON Taken.course = Courses.code AND Taken.grade != 'U';
 
--- Returns (Students, course, courseName, grade, credit)
+-- Returns (Students, course, course name, grade, credit)
 
 CREATE VIEW FinishedCourses AS
 SELECT
     Taken.student,
     Taken.course,
-    Courses.courseName,
+    Courses.name as courseName,
     Taken.grade,
     Courses.credits
 FROM Taken
@@ -69,13 +69,11 @@ FROM PassedCourses;
 
 CREATE VIEW totalCredits AS
 SELECT
-    Taken.student,
+    PassedCourses.student,
     COALESCE(SUM(Courses.credits), 0) AS totalCredits
-FROM Taken 
-LEFT JOIN Courses ON Taken.course = Courses.code
-WHERE EXISTS 
-(SELECT 1 FROM PassedCourses WHERE PassedCourses.student = Taken.student)
-GROUP BY student;
+FROM PassedCourses 
+JOIN Courses ON PassedCourses.course = Courses.code
+GROUP BY PassedCourses.student;
 
 CREATE VIEW mandatoryLeft AS 
 SELECT student, COALESCE(COUNT(course),0) as mandatoryLeft
@@ -111,7 +109,7 @@ GROUP BY studentID;
 CREATE VIEW seminarcourses AS
 SELECT 
     Taken.student AS studentID,
-    COALESCE(COUNT(Courses.credits), 0) AS seminarcount
+    COUNT(Courses.credits) AS seminarcount
 FROM Taken
 INNER JOIN Courses ON Taken.course = Courses.code 
 INNER JOIN PassedCourses ON PassedCourses.student = Taken.student 
@@ -121,34 +119,40 @@ AND Classified.classification = 'seminar'
 WHERE Classified.classification IS NOT NULL
 GROUP BY studentID;
 
-CREATE VIEW Qualifyed AS
-SELECT
-PassedCourses.student as student,
-COALESCE(SUM(PassedCourses.credits), 0) as Credits
-FROM Students 
-INNER JOIN Courses ON PassedCourses.course = Courses.code
-LEFT JOIN RecommendedBranch ON RecommendedBranch.course = Courses.code
-LEFT JOIN StudentBranches ON RecommendedBranch.branch = StudentBranches.branch;
-GROUP BY Students.idnr
+
+CREATE VIEW passedRecommended AS
+SELECT 
+    Students.idnr as student,
+    COALESCE(SUM(PassedCourses.credits),0) as credits
+FROM Students
+INNER JOIN PassedCourses ON Students.idnr = PassedCourses.student
+LEFT JOIN RecommendedBranch on RecommendedBranch.course = PassedCourses.course
+LEFT JOIN StudentBranches ON Students.idnr = StudentBranches.student
+AND RecommendedBranch.program = StudentBranches.program
+WHERE RecommendedBranch IS NOT NULL AND RecommendedBranch.branch = StudentBranches.branch
+GROUP BY Students.idnr;
 
 CREATE VIEW PathToGraduation AS
 SELECT 
-    Students.idnr as student,
-    COALESCE(totalCredits.totalCredits,0) as totalCredits,  
-    COALESCE(mandatoryLeft.mandatoryLeft,0) as mandatoryLeft,
-    COALESCE(mathCredits.mathCredits, 0) as mathCredits,
-    COALESCE(seminarcourses.seminarcount, 0) as seminarcount,
+    Students.idnr AS student,
+    COALESCE(totalCredits.totalCredits,0) AS totalCredits,
+    COALESCE(mandatoryLeft.mandatoryLeft,0) AS mandatoryLeft, 
+    COALESCE(mathCredits.mathCredits,0) AS mathCredits,
+    COALESCE(seminarcourses.seminarcount,0) as seminarcourses,
     (totalCredits.totalCredits > 10) AND 
-    (Qualifyed.Credits >= 10) AND
+    (passedRecommended.credits >= 10 AND passedRecommended.credits IS NOT NULL) AND 
     (mandatoryLeft.mandatoryLeft = 0 OR mandatoryLeft.mandatoryLeft IS NULL) AND
     (mathCredits.mathCredits >= 20 AND mathCredits.mathCredits IS NOT NULL) AND
-    (seminarcourses.seminarcount >= 1)
-     as Qualifyed
+    (seminarcourses.seminarcount >= 1 AND seminarcourses.seminarcount IS NOT NULL) AS qualified
 FROM Students
 LEFT JOIN totalCredits ON totalCredits.student = Students.idnr
 LEFT JOIN mandatoryLeft ON mandatoryLeft.student = Students.idnr
 LEFT JOIN mathCredits ON mathCredits.studentID = Students.idnr
 LEFT JOIN seminarcourses ON seminarcourses.studentID = Students.idnr
+<<<<<<< HEAD
 LEFT JOIN Qualifyed ON Students.idnr = Qualifyed.student;
 
+=======
+LEFT JOIN passedRecommended ON Students.idnr = passedRecommended.student;
+>>>>>>> cbf261a5fcb9d5a418142fc21176ea1c6f4b2905
 

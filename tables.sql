@@ -20,7 +20,7 @@ CREATE TABLE Branches
 CREATE TABLE Courses
 (
     code VARCHAR(6) PRIMARY KEY NOT NULL,
-    courseName VARCHAR(25) NOT NULL,
+    name VARCHAR(25) NOT NULL,
     credits FLOAT NOT NULL,
     department VARCHAR(10) NOT NULL
 );
@@ -35,8 +35,8 @@ CREATE TABLE LimitedCourses
 CREATE TABLE StudentBranches 
 (
     student VARCHAR(10) PRIMARY KEY,
-    branch TEXT,
-    program TEXT,
+    branch TEXT NOT NULL,
+    program TEXT NOT NULL,
     FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
     FOREIGN KEY (student) REFERENCES Students(idnr)
 );
@@ -106,7 +106,7 @@ CREATE TABLE WaitingList
 (
     student VARCHAR(10),
     course VARCHAR(6),
-    position INT,
+    position INT NOT NULL,
     FOREIGN KEY (student) REFERENCES Students(idnr),
     FOREIGN KEY (course) REFERENCES LimitedCourses(code),
     PRIMARY KEY (student, course)
