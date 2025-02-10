@@ -149,10 +149,5 @@ LEFT JOIN totalCredits ON totalCredits.student = Students.idnr
 LEFT JOIN mandatoryLeft ON mandatoryLeft.student = Students.idnr
 LEFT JOIN mathCredits ON mathCredits.studentID = Students.idnr
 LEFT JOIN seminarcourses ON seminarcourses.studentID = Students.idnr
-<<<<<<< HEAD
-LEFT JOIN Qualifyed ON Students.idnr = Qualifyed.student;
-
-=======
 LEFT JOIN passedRecommended ON Students.idnr = passedRecommended.student;
->>>>>>> cbf261a5fcb9d5a418142fc21176ea1c6f4b2905
 
