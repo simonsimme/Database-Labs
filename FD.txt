@@ -6,7 +6,30 @@ D(studentIdnr, studentName, login, branchName, programName, programAbbreviation,
 
 -- a) Functional dependencies --
 
-# REMOVE THIS LINE AND REPLACE IT WITH FDS ON THE FORM: a b -> c
+Students
+    studentIdnr -> studentName,login,branchname,programName
+
+Courses
+    courseCode -> courseName,credits,departmentName
+    
+
+Program
+    programName -> programAbbreviation
+    
+Department
+    departmentName -> departmentAbbreviation
+
+Branch
+    programName, branchName -> Branch
+
+
+Taken
+    studentIdnr, courseCode -> grade,credits
+
+WaitingList
+    studentIdnr, courseCode -> position
+    
+
 
 
 -- b) BCNF schema --
