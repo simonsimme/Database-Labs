@@ -7,13 +7,22 @@ CREATE TABLE Students
     name TEXT NOT NULL,
     login TEXT NOT NULL
 );
+CREATE TABLE Program 
+(
+    name TEXT NOT NULL PRIMARY KEY
+);
 
 CREATE TABLE Branches
 (
-    name TEXT NOT NULL,
+    name TEXT UNIQUE NOT NULL,
     program TEXT NOT NULL,
     PRIMARY KEY (name, program)  
 
+);
+CREATE TABLE Department
+(
+    name TEXT NOT NULL PRIMARY KEY,
+    Abbr TEXT NOT NULL
 );
 
 CREATE TABLE Courses
@@ -39,8 +48,8 @@ CREATE TABLE StudentBranches
     program TEXT NOT NULL,
     FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
     FOREIGN KEY (student) REFERENCES Students(idnr),
-    FOREING KEY (program) REFERENCES Program(name),
-    (student, program) UNIQUE
+    FOREIGN KEY (program) REFERENCES Program(name)
+   -- (student, program) UNIQUE
 );
 
 CREATE TABLE Classifications
@@ -60,11 +69,10 @@ CREATE TABLE Classified
 
 CREATE TABLE Prerequisites
 (
-    course VARCHAR(6),
+    course VARCHAR(6) PRIMARY KEY,
     prerequisiteCourse VARCHAR(6) NOT NULL,
-    FOREIGN KEY (course) REFERENCES Courses (code),
-    FOREIGN KEY (prerequisite) REFERENCES Courses (code),
-    PRIMARY KEY (course)
+    FOREIGN KEY (course) REFERENCES Courses(code),
+    FOREIGN KEY (prerequisiteCourse) REFERENCES Courses(code)
 );
 
 CREATE TABLE MandatoryProgram
@@ -116,24 +124,15 @@ CREATE TABLE Taken
 CREATE TABLE WaitingList
 (
     student VARCHAR(10),
-    course VARCHAR(6),
-    position INT NOT NULL,
+    course VARCHAR(6) UNIQUE,
+    position INT UNIQUE NOT NULL,
     FOREIGN KEY (student) REFERENCES Students(idnr),
     FOREIGN KEY (course) REFERENCES LimitedCourses(code),
     PRIMARY KEY (student, course)
-    (code, position) UNIQUE
 );
 
-CREATE TABLE Program 
-(
-    name TEXT NOT NULL PRIMARY KEY
-);
 
-CREATE TABLE Department
-(
-    name TEXT NOT NULL PRIMARY KEY,
-    Abbr TEXT NOT NULL
-);
+
 
 CREATE TABLE IsIn
 (
@@ -156,7 +155,7 @@ CREATE TABLE Hosting
 CREATE TABLE HasA -- Classifications connected to courses
 (
     code VARCHAR(6),
-    classification,
+    classification TEXT,
     FOREIGN KEY (code) REFERENCES Courses(code),
     FOREIGN KEY (classification) REFERENCES Classifications(name),
     PRIMARY KEY (code, classification)
