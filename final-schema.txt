@@ -2,7 +2,6 @@
 -- but extended with unique constraints and an additional fix. 
 
 
-
 Students(_idnr_, name, login)
 
 Courses(_code_, name, credits, department)
@@ -18,6 +17,7 @@ LimitedCourses(_code_, capacity)
 WaitingList(_student_, _code_, position)
   student -> Student.idnr
   code -> LimitedCourses.code
+  (code, position) UNIQUE
 
 Classification(_type_)
 
@@ -37,6 +37,7 @@ StudentBranches(_student_, _branch_, _program_)
   student -> Students.idnr
   branch -> Branch.name
   program -> Program.name
+  (student, program) UNIQUE
 
 Branch(_program_, _name_)
    program -> Program.name
@@ -49,6 +50,10 @@ MandatoryProgram(_code_, _program_)
   code -> Courses.code
   program -> program.name
 
+MandatoryBranch(_branch_, _course_)
+  branch -> Branch.name
+  course -> Course.code
+  
 IsIn(_student_, _program_)
   student -> Students.idnr
   program -> Program.name
@@ -58,5 +63,4 @@ Hosting(_program_, _department_)
   department -> Department.name
 
 Department(_name_, abbr)
-
 

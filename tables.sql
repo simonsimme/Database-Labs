@@ -4,9 +4,8 @@
 CREATE TABLE Students 
 (
     idnr VARCHAR(10) NOT NULL PRIMARY KEY CHECK (idnr ~ '\d{10}$'),
-    name VARCHAR(25) NOT NULL,
-    login TEXT NOT NULL, 
-    program TEXT NOT NULL
+    name TEXT NOT NULL,
+    login TEXT NOT NULL
 );
 
 CREATE TABLE Branches
@@ -20,9 +19,10 @@ CREATE TABLE Branches
 CREATE TABLE Courses
 (
     code VARCHAR(6) PRIMARY KEY NOT NULL,
-    name VARCHAR(25) NOT NULL,
+    name VARCHAR(6) NOT NULL,
     credits FLOAT NOT NULL,
-    department VARCHAR(10) NOT NULL
+    department VARCHAR(10) NOT NULL,
+    FOREIGN KEY (department) REFERENCES Department(name)
 );
 
 CREATE TABLE LimitedCourses 
@@ -38,7 +38,9 @@ CREATE TABLE StudentBranches
     branch TEXT NOT NULL,
     program TEXT NOT NULL,
     FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
-    FOREIGN KEY (student) REFERENCES Students(idnr)
+    FOREIGN KEY (student) REFERENCES Students(idnr),
+    FOREING KEY (program) REFERENCES Program(name),
+    (student, program) UNIQUE
 );
 
 CREATE TABLE Classifications
@@ -46,6 +48,7 @@ CREATE TABLE Classifications
     name TEXT NOT NULL PRIMARY KEY
 );
 
+-- TODO: TA BORT?
 CREATE TABLE Classified
 (
     course VARCHAR(6),
@@ -55,11 +58,21 @@ CREATE TABLE Classified
     PRIMARY KEY (course, classification)
 );
 
+CREATE TABLE Prerequisites
+(
+    course VARCHAR(6),
+    prerequisiteCourse VARCHAR(6) NOT NULL,
+    FOREIGN KEY (course) REFERENCES Courses (code),
+    FOREIGN KEY (prerequisite) REFERENCES Courses (code),
+    PRIMARY KEY (course)
+);
+
 CREATE TABLE MandatoryProgram
 (
     course VARCHAR(6),
     program TEXT NOT NULL,
     FOREIGN KEY (course) REFERENCES Courses (code),
+    FOREIGN KEY (program) REFERENCES Program (name),
     PRIMARY KEY (course, program)
 );
 
@@ -67,20 +80,18 @@ CREATE TABLE MandatoryBranch
 (
     course VARCHAR(6),
     branch TEXT,
-    program TEXT,
     FOREIGN KEY (course) REFERENCES Courses(code),
-    FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
-    PRIMARY KEY (course,branch,program)
+    FOREIGN KEY (branch) REFERENCES Branches(name),
+    PRIMARY KEY (course,branch)
 );
 
 CREATE TABLE RecommendedBranch
 (
     course VARCHAR(6),
     branch TEXT,
-    program TEXT,
     FOREIGN KEY (course) REFERENCES Courses(code),
-    FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
-    PRIMARY KEY (course,branch,program)
+    FOREIGN KEY (branch) REFERENCES Branches(name),
+    PRIMARY KEY (course,branch)
 );
 
 CREATE TABLE Registered
@@ -110,4 +121,43 @@ CREATE TABLE WaitingList
     FOREIGN KEY (student) REFERENCES Students(idnr),
     FOREIGN KEY (course) REFERENCES LimitedCourses(code),
     PRIMARY KEY (student, course)
+    (code, position) UNIQUE
 );
+
+CREATE TABLE Program 
+(
+    name TEXT NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE Department
+(
+    name TEXT NOT NULL PRIMARY KEY,
+    Abbr TEXT NOT NULL
+);
+
+CREATE TABLE IsIn
+(
+    student VARCHAR(10),
+    department TEXT,
+    FOREIGN KEY (student) REFERENCES Students(idnr),
+    FOREIGN KEY (department) REFERENCES Department(name),
+    PRIMARY KEY (student, department)
+);
+
+CREATE TABLE Hosting
+(
+    program TEXT,
+    department TEXT,
+    FOREIGN KEY (program) REFERENCES Program(name),
+    FOREIGN KEY (department) REFERENCES Department(name),
+    PRIMARY KEY (program, department)
+);
+
+CREATE TABLE HasA -- Classifications connected to courses
+(
+    code VARCHAR(6),
+    classification,
+    FOREIGN KEY (code) REFERENCES Courses(code),
+    FOREIGN KEY (classification) REFERENCES Classifications(name),
+    PRIMARY KEY (code, classification)
+)
