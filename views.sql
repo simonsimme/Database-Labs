@@ -50,16 +50,19 @@ FROM WaitingList;
 -- (Student, course)
 CREATE VIEW UnreadMandatory AS
 (SELECT
-    IsIn.student AS student,
+    Students.idnr AS Student,
     MandatoryProgram.course
-FROM MandatoryProgram
-INNER JOIN IsIn ON MandatoryProgram.program = IsIn.program)
+FROM Students
+INNER JOIN IsIn ON Students.idnr = IsIn.student 
+INNER JOIN MandatoryProgram ON MandatoryProgram.program = IsIn.program)
 UNION
 SELECT
-    Taken.student,
+    Registered.student,
     MandatoryBranch.course
-FROM MandatoryBranch
-LEFT JOIN Taken ON MandatoryBranch.course = Taken.course;
+FROM studentBranches
+LEFT JOIN MandatoryBranch ON MandatoryBranch.branch = StudentBranches.branch
+LEFT JOIN Registered ON MandatoryBranch.course = Registered.course
+EXCEPT
 SELECT
     PassedCourses.student,
     PassedCourses.course
@@ -126,8 +129,8 @@ FROM Students
 INNER JOIN PassedCourses ON Students.idnr = PassedCourses.student
 LEFT JOIN RecommendedBranch on RecommendedBranch.course = PassedCourses.course
 LEFT JOIN StudentBranches ON Students.idnr = StudentBranches.student
-AND RecommendedBranch.program = StudentBranches.program
-WHERE RecommendedBranch IS NOT NULL AND RecommendedBranch.branch = StudentBranches.branch
+AND RecommendedBranch.branch = StudentBranches.branch
+WHERE RecommendedBranch IS NOT NULL
 GROUP BY Students.idnr;
 
 CREATE VIEW PathToGraduation AS
