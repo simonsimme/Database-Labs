@@ -6,9 +6,10 @@ SELECT
     Students.idnr,
     Students.name,
     Students.login,
-    Students.program,
+    IsIn.program,
     StudentBranches.branch
 FROM Students
+LEFT JOIN IsIn ON IsIn.student = Students.idnr
 FULL OUTER JOIN StudentBranches ON Students.idnr = StudentBranches.student;
 
 -- Helper function for FinishedCourses, returns (Students, course, credits)
@@ -49,18 +50,20 @@ FROM WaitingList;
 
 -- (Student, course)
 CREATE VIEW UnreadMandatory AS
-(SELECT
-    Students.idnr AS student,
+SELECT
+    Students.idnr AS Student,
     MandatoryProgram.course
-FROM MandatoryProgram
-INNER JOIN Students ON MandatoryProgram.program = Students.program
+FROM Students
+INNER JOIN IsIn ON Students.idnr = IsIn.student 
+INNER JOIN MandatoryProgram ON MandatoryProgram.program = IsIn.program
 UNION
 SELECT
     StudentBranches.student,
     MandatoryBranch.course
-FROM MandatoryBranch
-INNER JOIN StudentBranches ON MandatoryBranch.program = StudentBranches.program 
-AND MandatoryBranch.branch = StudentBranches.branch)
+FROM StudentBranches
+INNER JOIN MandatoryBranch ON MandatoryBranch.branch = StudentBranches.branch 
+AND 
+MandatoryBranch.program = StudentBranches.program
 EXCEPT
 SELECT
     PassedCourses.student,
@@ -100,9 +103,9 @@ FROM Taken
 INNER JOIN Courses ON Taken.course = Courses.code 
 INNER JOIN PassedCourses ON PassedCourses.student = Taken.student 
 AND PassedCourses.course = Courses.code
-LEFT JOIN Classified ON Courses.code = Classified.course 
-AND Classified.classification = 'math'
-WHERE Classified.classification IS NOT NULL
+LEFT JOIN HasA ON Courses.code = HasA.code 
+AND HasA.classification = 'math'
+WHERE HasA.classification IS NOT NULL
 GROUP BY studentID;
 
 -- (student, count(seminarcourses))
@@ -114,10 +117,11 @@ FROM Taken
 INNER JOIN Courses ON Taken.course = Courses.code 
 INNER JOIN PassedCourses ON PassedCourses.student = Taken.student 
 AND PassedCourses.course = Courses.code
-LEFT JOIN Classified ON Courses.code = Classified.course 
-AND Classified.classification = 'seminar'
-WHERE Classified.classification IS NOT NULL
+LEFT JOIN HasA ON Courses.code = HasA.code
+AND HasA.classification = 'seminar'
+WHERE HasA.classification IS NOT NULL
 GROUP BY studentID;
+
 
 
 CREATE VIEW passedRecommended AS
@@ -126,7 +130,7 @@ SELECT
     COALESCE(SUM(PassedCourses.credits),0) as credits
 FROM Students
 INNER JOIN PassedCourses ON Students.idnr = PassedCourses.student
-LEFT JOIN RecommendedBranch on RecommendedBranch.course = PassedCourses.course
+LEFT JOIN RecommendedBranch on RecommendedBranch.course = PassedCourses.course 
 LEFT JOIN StudentBranches ON Students.idnr = StudentBranches.student
 AND RecommendedBranch.program = StudentBranches.program
 WHERE RecommendedBranch IS NOT NULL AND RecommendedBranch.branch = StudentBranches.branch

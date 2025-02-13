@@ -72,9 +72,9 @@ ORDER BY (status, course, student);
 -- FROM PassedCourses
 -- ORDER BY (student, course);
 
--- SELECT student, course
--- FROM UnreadMandatory
--- ORDER BY (student, course);
+SELECT student, course
+FROM UnreadMandatory
+ORDER BY (student, course);
 
 -- SELECT student, course, credits
 -- FROM RecommendedCourses
