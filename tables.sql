@@ -1,6 +1,4 @@
 -- This file will contain all your tables
-
-
 CREATE TABLE Students 
 (
     idnr VARCHAR(10) NOT NULL PRIMARY KEY CHECK (idnr ~ '\d{10}$'),
@@ -48,8 +46,8 @@ CREATE TABLE StudentBranches
     program TEXT NOT NULL,
     FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
     FOREIGN KEY (student) REFERENCES Students(idnr),
-    FOREIGN KEY (program) REFERENCES Program(name)
-   -- (student, program) UNIQUE
+    FOREIGN KEY (program) REFERENCES Program(name),
+    UNIQUE (student, program) 
 );
 
 CREATE TABLE Classifications
