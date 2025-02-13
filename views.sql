@@ -50,18 +50,16 @@ FROM WaitingList;
 -- (Student, course)
 CREATE VIEW UnreadMandatory AS
 (SELECT
-    Students.idnr AS student,
+    IsIn.student AS student,
     MandatoryProgram.course
 FROM MandatoryProgram
-INNER JOIN Students ON MandatoryProgram.program = BasicInformation.program)
+INNER JOIN IsIn ON MandatoryProgram.program = IsIn.program)
 UNION
 SELECT
-    StudentBranches.student,
+    Taken.student,
     MandatoryBranch.course
 FROM MandatoryBranch
-INNER JOIN StudentBranches ON MandatoryBranch.program = StudentBranches.program 
-AND MandatoryBranch.branch = StudentBranches.branch;
-EXCEPT
+LEFT JOIN Taken ON MandatoryBranch.course = Taken.course;
 SELECT
     PassedCourses.student,
     PassedCourses.course
@@ -100,9 +98,9 @@ FROM Taken
 INNER JOIN Courses ON Taken.course = Courses.code 
 INNER JOIN PassedCourses ON PassedCourses.student = Taken.student 
 AND PassedCourses.course = Courses.code
-LEFT JOIN Classified ON Courses.code = Classified.course 
-AND Classified.classification = 'math'
-WHERE Classified.classification IS NOT NULL
+LEFT JOIN HasA ON Courses.code = HasA.code 
+AND HasA.classification = 'math'
+WHERE HasA.classification IS NOT NULL
 GROUP BY studentID;
 
 -- (student, count(seminarcourses))
@@ -114,9 +112,9 @@ FROM Taken
 INNER JOIN Courses ON Taken.course = Courses.code 
 INNER JOIN PassedCourses ON PassedCourses.student = Taken.student 
 AND PassedCourses.course = Courses.code
-LEFT JOIN Classified ON Courses.code = Classified.course 
-AND Classified.classification = 'seminar'
-WHERE Classified.classification IS NOT NULL
+LEFT JOIN HasA ON Courses.code = HasA.code 
+AND HasA.classification = 'seminar'
+WHERE HasA.classification IS NOT NULL
 GROUP BY studentID;
 
 
