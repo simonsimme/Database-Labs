@@ -7,16 +7,27 @@ CREATE TABLE Students
 );
 CREATE TABLE Program 
 (
-    name TEXT NOT NULL PRIMARY KEY
+    name TEXT  NOT NULL PRIMARY KEY
+    
 );
-
 CREATE TABLE Branches
 (
-    name TEXT UNIQUE NOT NULL,
-    program TEXT NOT NULL,
-    PRIMARY KEY (name, program)  
-
+    name TEXT NOT NULL PRIMARY KEY
+    
+   
 );
+CREATE TABLE BranchPrograms
+(
+    branch TEXT NOT NULL,
+    program TEXT NOT NULL,
+    FOREIGN KEY (branch) REFERENCES Branches(name),
+    FOREIGN KEY (program) REFERENCES Program(name),
+    PRIMARY KEY (branch, program)
+);
+
+
+
+
 CREATE TABLE Department
 (
     name TEXT NOT NULL PRIMARY KEY,
@@ -44,25 +55,16 @@ CREATE TABLE StudentBranches
     student VARCHAR(10) PRIMARY KEY,
     branch TEXT NOT NULL,
     program TEXT NOT NULL,
-    FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
+    FOREIGN KEY (branch, program) REFERENCES BranchPrograms(branch, program),
+   -- FOREIGN KEY (program) REFERENCES Program(name),
     FOREIGN KEY (student) REFERENCES Students(idnr),
-    FOREIGN KEY (program) REFERENCES Program(name),
+   -- FOREIGN KEY (branch) REFERENCES Branches(name),
     UNIQUE (student, program) 
 );
 
 CREATE TABLE Classifications
 (
     name TEXT NOT NULL PRIMARY KEY
-);
-
--- TODO: TA BORT?
-CREATE TABLE Classified
-(
-    course VARCHAR(6),
-    classification TEXT,
-    FOREIGN KEY (course) REFERENCES Courses (code),
-    FOREIGN KEY (classification) REFERENCES Classifications (name),
-    PRIMARY KEY (course, classification)
 );
 
 CREATE TABLE Prerequisites
@@ -121,24 +123,28 @@ CREATE TABLE Taken
 
 CREATE TABLE WaitingList
 (
-    student VARCHAR(10),
-    course VARCHAR(6) UNIQUE,
-    position INT UNIQUE NOT NULL,
+    student VARCHAR(10) NOT NULL,
+    course VARCHAR(6) NOT NULL,
+    position INT  NOT NULL,
     FOREIGN KEY (student) REFERENCES Students(idnr),
     FOREIGN KEY (course) REFERENCES LimitedCourses(code),
     PRIMARY KEY (student, course)
 );
+CREATE TABLE GivenBy(
+    course VARCHAR(6) NOT NULL PRIMARY KEY,
+    department TEXT NOT NULL,
+    FOREIGN KEY (course) REFERENCES Courses(code),
+    FOREIGN KEY (department) REFERENCES Department(name)
 
-
-
+);
 
 CREATE TABLE IsIn
 (
     student VARCHAR(10),
-    department TEXT,
+    program TEXT,
     FOREIGN KEY (student) REFERENCES Students(idnr),
-    FOREIGN KEY (department) REFERENCES Department(name),
-    PRIMARY KEY (student, department)
+    FOREIGN KEY (program) REFERENCES Program(name),
+    PRIMARY KEY (student, program)
 );
 
 CREATE TABLE Hosting

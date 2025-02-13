@@ -6,7 +6,7 @@ SELECT
     Students.idnr,
     Students.name,
     Students.login,
-    Students.program,
+    StudentBranches.program AS program,
     StudentBranches.branch
 FROM Students
 FULL OUTER JOIN StudentBranches ON Students.idnr = StudentBranches.student;
@@ -53,14 +53,14 @@ CREATE VIEW UnreadMandatory AS
     Students.idnr AS student,
     MandatoryProgram.course
 FROM MandatoryProgram
-INNER JOIN Students ON MandatoryProgram.program = Students.program
+INNER JOIN Students ON MandatoryProgram.program = BasicInformation.program)
 UNION
 SELECT
     StudentBranches.student,
     MandatoryBranch.course
 FROM MandatoryBranch
 INNER JOIN StudentBranches ON MandatoryBranch.program = StudentBranches.program 
-AND MandatoryBranch.branch = StudentBranches.branch)
+AND MandatoryBranch.branch = StudentBranches.branch;
 EXCEPT
 SELECT
     PassedCourses.student,
