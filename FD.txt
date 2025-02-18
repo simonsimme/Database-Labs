@@ -14,26 +14,26 @@ Students
 
 
 Courses
-7   courseCode -> courseName,credits,departmentName
+8   courseCode -> courseName,credits,departmentName,capacity
     
 Program
-8   programName -> programAbbreviation
+9   programName -> programAbbreviation
   
 Department
-10    departmentName -> departmentAbbreviation
+11    departmentName -> departmentAbbreviation
       departmentAbbreviation -> departmentName
 
 Taken
-12    studentIdnr, courseCode -> grade, credits
+12   studentIdnr, courseCode -> grade
 
 WaitingList
-13    studentIdnr, courseCode -> position
+14    studentIdnr, courseCode -> position
+        position, courseCode -> studentIdnr
 
 LimitedCourses
-14    courseCode -> capacity
+15    courseCode -> capacity
     
-Classification
-15    courseCode -> classification
+    
 
 
 
