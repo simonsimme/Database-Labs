@@ -6,7 +6,8 @@
 -- IMPORTANT: This file should be a translation of your diagram
 -- without any additions (no additional constraints etc)!
 
-Students(_idnr_, name, login)
+Students(_idnr_, name, login, program)
+  program -> Program.name
 
 Courses(_code_, name, credits, department)
   department -> Department.name
@@ -51,14 +52,12 @@ RecommendedBranch(_branch_, _code_)
 MandatoryProgram(_code_, _program_)
   code -> Courses.code
   program -> program.name
-
-IsIn(_student_, _program_)
-  student -> Students.idnr
-  program -> Program.name
   
 Hosting(_program_, _department_)
   program -> Program.name
   department -> Department.name
 
 Department(_name_, abbr)
+
+
 

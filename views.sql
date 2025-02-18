@@ -6,11 +6,10 @@ SELECT
     Students.idnr,
     Students.name,
     Students.login,
-    IsIn.program,
+    Students.program,
     StudentBranches.branch
 FROM Students
-LEFT JOIN IsIn ON IsIn.student = Students.idnr
-FULL OUTER JOIN StudentBranches ON Students.idnr = StudentBranches.student;
+INNER JOIN StudentBranches ON Students.idnr = StudentBranches.student;
 
 -- Helper function for FinishedCourses, returns (Students, course, credits)
 CREATE VIEW PassedCourses AS
@@ -54,8 +53,7 @@ SELECT
     Students.idnr AS Student,
     MandatoryProgram.course
 FROM Students
-INNER JOIN IsIn ON Students.idnr = IsIn.student 
-INNER JOIN MandatoryProgram ON MandatoryProgram.program = IsIn.program
+INNER JOIN MandatoryProgram ON MandatoryProgram.program = Students.program
 UNION
 SELECT
     StudentBranches.student,

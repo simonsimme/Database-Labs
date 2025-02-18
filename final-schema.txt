@@ -2,7 +2,8 @@
 -- but extended with unique constraints and an additional fix. 
 
 
-Students(_idnr_, name, login)
+Students(_idnr_, name, login, program)
+  program -> Program.name
 
 Courses(_code_, name, credits, department)
   department -> Department.name
@@ -53,10 +54,6 @@ MandatoryProgram(_code_, _program_)
 MandatoryBranch(_branch_, _course_)
   branch -> Branch.name
   course -> Course.code
-  
-IsIn(_student_, _program_)
-  student -> Students.idnr
-  program -> Program.name
   
 Hosting(_program_, _department_)
   program -> Program.name

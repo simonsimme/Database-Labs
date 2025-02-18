@@ -1,18 +1,20 @@
 -- This file will contain all your tables
 
+CREATE TABLE Program 
+(
+    name TEXT  NOT NULL PRIMARY KEY
+);
+
 
 CREATE TABLE Students 
 (
     idnr VARCHAR(10) NOT NULL PRIMARY KEY CHECK (idnr ~ '\d{10}$'),
     name TEXT NOT NULL,
-    login TEXT NOT NULL
+    login TEXT NOT NULL,
+    program TEXT NOT NULL,
+    FOREIGN KEY (program) REFERENCES Program(name)
 );
 
-CREATE TABLE Program 
-(
-    name TEXT  NOT NULL PRIMARY KEY
-
-);
 
 CREATE TABLE Branches
 (
@@ -50,7 +52,7 @@ CREATE TABLE LimitedCourses
     FOREIGN KEY (code) REFERENCES Courses (code)
 );
 
---8
+
 CREATE TABLE StudentBranches 
 (
     student VARCHAR(10) PRIMARY KEY,
@@ -59,7 +61,6 @@ CREATE TABLE StudentBranches
     FOREIGN KEY (program, branch) REFERENCES BranchPrograms(program, branch),
     FOREIGN KEY (student) REFERENCES Students(idnr),
     UNIQUE (student, program)   
-   -- (student, program) UNIQUE
 );
 
 CREATE TABLE Classifications
@@ -137,14 +138,6 @@ CREATE TABLE WaitingList
     UNIQUE (course, position)     
 );
 
-CREATE TABLE IsIn
-(
-    student VARCHAR(10),
-    program TEXT,
-    FOREIGN KEY (student) REFERENCES Students(idnr),
-    FOREIGN KEY (program) REFERENCES Program(name),
-    PRIMARY KEY (student, program)
-);
 
 CREATE TABLE Hosting
 (
@@ -155,7 +148,7 @@ CREATE TABLE Hosting
     PRIMARY KEY (program, department)
 );
 
-CREATE TABLE HasA -- Classifications connected to courses
+CREATE TABLE HasA
 (
     code VARCHAR(6),
     classification TEXT,
