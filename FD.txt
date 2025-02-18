@@ -52,14 +52,11 @@ Table 3 (_departmentAbbreviation_, departmentName)
 fd: departmentName         -> departmentAbbreviation
     departmentAbbreviation -> departmentName
 
-Table 4 (_courseCode_, departmentAbbreviation, courseName, credits, capacity, classification) 
-fd: courseCode -> departmentAbbreviation, courseName, credits, capacity, classification
+Table 4 (_courseCode_, departmentAbbreviation, courseName, credits, capacity) 
+fd: courseCode -> departmentAbbreviation, courseName, credits, capacity
 
-table 5 (_courseCode_, _studentIdnr_, grade)
-fd: courseCode, studentIdnr -> grade
-
-table 6 (_studentIdnr_, _courseCode_, _position_)
-fd: none
+table 5 (_courseCode_, _studentIdnr_, grade, position)
+fd: courseCode, studentIdnr -> grade, position
 
 It removed 2 redundant functional dependencies and is nicely strucured and very much alike our schema from part 1, 
 the only flaw is that table 4 is a combination of Courses and LimitedCourses which isnt right for our domain description since not all are LimitedCourses
