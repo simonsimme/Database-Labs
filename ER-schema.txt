@@ -52,6 +52,10 @@ RecommendedBranch(_branch_, _code_)
 MandatoryProgram(_code_, _program_)
   code -> Courses.code
   program -> program.name
+
+MandatoryBranch(_branch_, _code_)
+   branch -> Branch.name
+   code -> Courses.code
   
 Hosting(_program_, _department_)
   program -> Program.name
