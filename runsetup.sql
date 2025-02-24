@@ -82,8 +82,8 @@ ORDER BY (student, course);
 
 
 -- Part 3, once it is ready
--- \ir triggers.sql
+ \ir triggers.sql
 -- To run the file "tests.sql", you might want to let psql continue
 -- even if there are errors 
 -- \set ON_ERROR_STOP OFF
--- \ir tests.sql
+ \ir tests.sql
