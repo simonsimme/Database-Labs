@@ -37,22 +37,20 @@ BEGIN
 
 
 -- TODO: FIX TO SEE IF STUDENT PASSED COURSE HES APPLYING TO\
-    -- SELECT COUNT(*) INTO passedCurr
+    SELECT COUNT(*) INTO passedCurr
+    FROM PassedCourses 
+    WHERE student = NEW.student AND course = NEW.course;
 
     -- Checking to satisfy student not already registered or in waiting list and has passed all prerequisites
-    IF student_inRegistered > 0 THEN
-        RAISE EXCEPTION 'Student is already registered';
-    ELSEIF student_inWaitinglist > 0 THEN
-        RAISE EXCEPTION 'Student is already in the waiting list';
-    ELSEIF nrPrereqs > 0 AND passedPreReqs < nrPrereqs THEN
-        RAISE EXCEPTION 'Student has not passed all prerequisite courses';
-    ELSEIF 
+    IF student_inRegistered > 0 OR student_inWaitinglist > 0 THEN
+        RAISE EXCEPTION 'Failure: Already registered or in waiting list';
 
-    -- Checking to see where we route the student
-  /*   ELSEIF current_capacity >= max_capacity THEN
-        INSERT INTO WaitingList (student, code, position) VALUES 
-        (NEW.student, NEW.code, (SELECT COALESCE(MAX(position), 0) + 1 FROM WaitingList WHERE code = NEW.code));
-        RETURN NULL; */ -- Not on wating list should be on Registrations
+    ELSEIF nrPrereqs > 0 AND passedPreReqs < nrPrereqs THEN
+        RAISE EXCEPTION 'Failure: Student has not passed all the prerequisite courses';
+
+    ELSEIF passedCurr > 0 THEN
+        RAISE EXCEPTION 'Failure: Student has passed course';
+
     ELSEIF current_capacity >= max_capacity THEN
         INSERT INTO WaitingList (student, course, position) VALUES 
         (NEW.student, NEW.course, (SELECT COALESCE(MAX(position), 0) + 1 FROM WaitingList WHERE course = NEW.course));
@@ -78,28 +76,40 @@ DECLARE
     newStudent text;
     newCourse text;
 BEGIN
-    leftCourse = OLD.course;
+    leftCourse := OLD.course;
 
     SELECT capacity INTO max_capacity
     FROM LimitedCourses
     WHERE code = OLD.course;
 
-    SELECT COUNT(*) INTO current_capacity
-    FROM Registered
-    WHERE course = OLD.course;
+    IF OLD.status = 'waiting' THEN
+    DELETE FROM WaitingList WHERE student = OLD.student AND course = OLD.course;
+    UPDATE WaitingList SET position = position - 1 
+    WHERE course = OLD.course AND position > 1;
 
-    IF current_capacity < max_capacity THEN
+    ELSE 
+        DELETE FROM Registered WHERE student = OLD.student AND course = OLD.course;
+        
+        SELECT COUNT(*) INTO current_capacity
+        FROM Registered
+        WHERE course = OLD.course;
+
+        IF current_capacity < max_capacity THEN
         SELECT student, course INTO newStudent, newCourse
         FROM WaitingList
-        WHERE course = leftCourse AND position = 1;
-        INSERT INTO Registered (student, course) VALUES (newStudent, newCourse);
-        DELETE FROM Registered WHERE student = OLD.student AND course = OLD.course;
-        DELETE FROM WaitingList WHERE course = leftCourse AND student = newStudent;
-        return NULL;
-    ELSE    
-        DELETE FROM Registered WHERE student = OLD.student AND course = OLD.course;
-        return NULL;
+        WHERE course = leftCourse
+        ORDER BY position
+        LIMIT 1;
+            IF newStudent IS NOT NULL THEN
+            INSERT INTO Registered (student, course) VALUES (newStudent, newCourse);
+            DELETE FROM WaitingList WHERE course = leftCourse AND student = newStudent;
+        
+            UPDATE WaitingList SET position = position - 1 
+            WHERE course = leftCourse AND position > 1;
+            END IF;
+        END IF;
     END IF;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
