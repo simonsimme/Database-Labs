@@ -71,8 +71,9 @@ CREATE TABLE Classifications
 
 CREATE TABLE Prerequisites
 (
-    course VARCHAR(6) PRIMARY KEY,
+    course VARCHAR(6),
     prerequisiteCourse VARCHAR(6) NOT NULL,
+    PRIMARY KEY (course, prerequisiteCourse),
     FOREIGN KEY (course) REFERENCES Courses(code),
     FOREIGN KEY (prerequisiteCourse) REFERENCES Courses(code)
 );
