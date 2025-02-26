@@ -53,7 +53,7 @@ CREATE TABLE StudentBranches
     branch TEXT,
     program TEXT,
     PRIMARY KEY (student, branch, program),
-    FOREIGN KEY (program, branch) REFERENCES Branches(program, branch),
+    FOREIGN KEY (program, branch) REFERENCES Branches(program, name),
     FOREIGN KEY (student) REFERENCES Students(idnr),
     UNIQUE (student, program)   
 );

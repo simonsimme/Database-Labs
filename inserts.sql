@@ -1,8 +1,9 @@
-INSERT INTO Branches VALUES ('B1');
-INSERT INTO Branches VALUES ('B2');
-
 INSERT INTO Program VALUES ('Prog1');
 INSERT INTO Program VALUES ('Prog2');
+
+INSERT INTO Branches VALUES ('B1', 'Prog1');
+INSERT INTO Branches VALUES ('B1', 'Prog2');
+INSERT INTO Branches VALUES ('B2', 'Prog1');
 
 INSERT INTO Students VALUES ('1111111111','N1','ls1', 'Prog1');
 INSERT INTO Students VALUES ('2222222222','N2','ls2', 'Prog1');
@@ -13,9 +14,9 @@ INSERT INTO Students VALUES ('6666666666','Nx','ls6', 'Prog2');
 
 INSERT INTO Department VALUES ('Dep1', 'Dep1');
 
-INSERT INTO BranchPrograms VALUES ('B1', 'Prog1');
-INSERT INTO BranchPrograms VALUES ('B1', 'Prog2');
-INSERT INTO BranchPrograms VALUES ('B2', 'Prog1');
+-- INSERT INTO BranchPrograms VALUES ('B1', 'Prog1');
+-- INSERT INTO BranchPrograms VALUES ('B1', 'Prog2');
+-- INSERT INTO BranchPrograms VALUES ('B2', 'Prog1');
 
 INSERT INTO Courses VALUES ('CCC111','C1',22.5,'Dep1');
 INSERT INTO Courses VALUES ('CCC222','C2',20,'Dep1');
