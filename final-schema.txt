@@ -4,6 +4,7 @@
 
 Students(_idnr_, name, login, program)
   program -> Program.name
+  UNIQUE (login)
 
 Programs(_name_, abbr)
 
