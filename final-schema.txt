@@ -5,10 +5,12 @@
 Students(_idnr_, name, login, program)
   program -> Program.name
 
+Programs(_name_, abbr)
+
 Courses(_code_, name, credits, department)
   department -> Department.name
 
-prerequisites(_code_, course)
+prerequisites(_code_, _course_)
   code -> Course.code
   course -> Course.code
 
@@ -18,7 +20,6 @@ LimitedCourses(_code_, capacity)
 WaitingList(_student_, _code_, position)
   student -> Student.idnr
   code -> LimitedCourses.code
-  (code, position) UNIQUE
 
 Classification(_type_)
 
@@ -36,25 +37,24 @@ Registered(_student_, _code_)
 
 StudentBranches(_student_, _branch_, _program_)
   student -> Students.idnr
-  branch -> Branch.name
-  program -> Program.name
-  (student, program) UNIQUE
+  program -> Programs.name
+  (branch, program) -> (Branch.name, Branch.program)
 
 Branch(_program_, _name_)
    program -> Program.name
 
-RecommendedBranch(_branch_, _code_)
-   branch -> Branch.name
+RecommendedBranch(_branch_, _program_, _code_)
    code -> Courses.code
+   (branch, program) -> (Branch.name, Branch.program)
   
 MandatoryProgram(_code_, _program_)
   code -> Courses.code
   program -> program.name
 
-MandatoryBranch(_branch_, _course_)
-  branch -> Branch.name
-  course -> Course.code
-  
+MandatoryBranch(_branch_, _program_, _code_)
+   code -> Courses.code
+   (branch, program) -> (Branch.name, Branch.program)
+
 Hosting(_program_, _department_)
   program -> Program.name
   department -> Department.name
