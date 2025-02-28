@@ -146,6 +146,9 @@ BEGIN
         UPDATE WaitingList
         SET position = position -1
         WHERE  course = leftCourse AND position > removedPosition;
+          ELSE
+        -- Base case: No action needed if no students in waiting list or capacity is full
+        RAISE NOTICE 'No action needed';
         END IF;
  
     RETURN NULL;
