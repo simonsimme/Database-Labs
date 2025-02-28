@@ -13,22 +13,16 @@ CREATE TABLE Students
     login TEXT NOT NULL,
     program TEXT NOT NULL,
     FOREIGN KEY (program) REFERENCES Program(name),
-    UNIQUE (login),
+    UNIQUE (login)
 );
 
 
 CREATE TABLE Branches
 (
-    name TEXT NOT NULL PRIMARY KEY
-);
-
-CREATE TABLE BranchPrograms
-(
-    branch TEXT NOT NULL,
+    name TEXT NOT NULL,
     program TEXT NOT NULL,
-    FOREIGN KEY (branch) REFERENCES Branches(name),
     FOREIGN KEY (program) REFERENCES Program(name),
-    PRIMARY KEY (branch, program)
+    PRIMARY KEY (name, program)
 );
 
 CREATE TABLE Department
@@ -56,10 +50,11 @@ CREATE TABLE LimitedCourses
 
 CREATE TABLE StudentBranches 
 (
-    student VARCHAR(10) PRIMARY KEY,
+    student VARCHAR(10),
     branch TEXT,
     program TEXT,
-    FOREIGN KEY (program, branch) REFERENCES BranchPrograms(program, branch),
+    PRIMARY KEY (student, branch, program),
+    FOREIGN KEY (program, branch) REFERENCES Branches(program, name),
     FOREIGN KEY (student) REFERENCES Students(idnr),
     UNIQUE (student, program)   
 );
@@ -93,9 +88,8 @@ CREATE TABLE MandatoryBranch
     course VARCHAR(6),
     branch TEXT,
     program TEXT,
-    FOREIGN KEY (program) REFERENCES Program (name),
     FOREIGN KEY (course) REFERENCES Courses(code),
-    FOREIGN KEY (branch) REFERENCES Branches(name),
+    FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
     PRIMARY KEY (course,branch,program)
 );
 
@@ -104,10 +98,9 @@ CREATE TABLE RecommendedBranch
     course VARCHAR(6),
     branch TEXT,
     program TEXT,
-    FOREIGN KEY (program) REFERENCES Program(name),
     FOREIGN KEY (course) REFERENCES Courses(code),
-    FOREIGN KEY (branch) REFERENCES Branches(name),
-    PRIMARY KEY (course,branch)
+    FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
+    PRIMARY KEY (course,branch,program)
 );
 
 CREATE TABLE Registered

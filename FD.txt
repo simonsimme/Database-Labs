@@ -10,28 +10,26 @@ D(studentIdnr, studentName, login, branchName, programName, programAbbreviation,
 
 Functional dependencies:
 Students
-4   studentIdnr -> studentName, login, branchName, programName
-
+5   studentIdnr -> studentName, login, branchName, programName
+    login -> studentIdnr
 
 Courses
-8   courseCode -> courseName,credits,departmentName,capacity
+9   courseCode -> courseName,credits,departmentName,capacity
     
 Program
-9   programName -> programAbbreviation
+10   programName -> programAbbreviation
   
 Department
-11    departmentName -> departmentAbbreviation
+12    departmentName -> departmentAbbreviation
       departmentAbbreviation -> departmentName
 
 Taken
-12   studentIdnr, courseCode -> grade
+13   studentIdnr, courseCode -> grade
 
 WaitingList
-14    studentIdnr, courseCode -> position
+15    studentIdnr, courseCode -> position
         position, courseCode -> studentIdnr
 
-LimitedCourses
-15    courseCode -> capacity
     
     
 
