@@ -123,9 +123,7 @@ BEGIN
     IF student_is_reg > 0 THEN
      DELETE FROM Registered WHERE student = OLD.student AND course = OLD.course;
      current_capacity = current_capacity -1;
-     END IF;
-
-        IF student_inWaitingList > 0 THEN
+     ELSE
         SELECT position INTO removedPosition FROM WaitingList
         WHERE course = leftCourse AND student = OLD.student;
         DELETE FROM WaitingList WHERE course = leftCourse AND student = OLD.student;
@@ -133,13 +131,13 @@ BEGIN
         SET position = position -1
         WHERE  course = leftCourse AND position > removedPosition;
         END IF;
+    END IF;
        
 
  --if students in waitinglist let first one join
      IF current_capacity < max_capacity AND waitingListCount > 0  THEN
         SELECT student, course INTO newStudent, newCourse FROM WaitingList
         WHERE course = leftCourse AND position = 1;
-        RAISE NOTICE 'hi';
         DELETE FROM WaitingList WHERE course = leftCourse AND student = newStudent;
         INSERT INTO Registered (student, course) VALUES (newStudent, newCourse);
         removedPosition = 1;
