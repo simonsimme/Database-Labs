@@ -12,7 +12,8 @@ CREATE TABLE Students
     name TEXT NOT NULL,
     login TEXT NOT NULL,
     program TEXT NOT NULL,
-    FOREIGN KEY (program) REFERENCES Program(name)
+    FOREIGN KEY (program) REFERENCES Program(name),
+    UNIQUE (login),
 );
 
 
