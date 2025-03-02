@@ -41,13 +41,11 @@ BEGIN
     IF student_inRegistered > 0 THEN 
         RAISE EXCEPTION 'Student is allready registered';
         RETURN NULL;
-
     END IF;
     
     IF student_inWaitingList > 0 THEN 
         RAISE EXCEPTION 'Student is allready in waiting list';
         RETURN NULL;
-
     END IF;
 
 
@@ -130,7 +128,7 @@ BEGIN
         UPDATE WaitingList
         SET position = position -1
         WHERE  course = leftCourse AND position > removedPosition;
-        END IF;
+    
     END IF;
        
 
@@ -144,11 +142,10 @@ BEGIN
         UPDATE WaitingList
         SET position = position -1
         WHERE  course = leftCourse AND position > removedPosition;
-          ELSE
+    ELSE
         -- Base case: No action needed if no students in waiting list or capacity is full
         RAISE NOTICE 'No action needed';
-        END IF;
- 
+    END IF;
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
