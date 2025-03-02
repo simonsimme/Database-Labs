@@ -35,7 +35,7 @@ CREATE TABLE Courses
 (
     code VARCHAR(6) PRIMARY KEY NOT NULL,
     name VARCHAR(6) NOT NULL,
-    credits FLOAT NOT NULL,
+    credits FLOAT NOT NULL CHECK (credits > 0),
     department VARCHAR(10) NOT NULL,
     FOREIGN KEY (department) REFERENCES Department(name)
 );
@@ -126,7 +126,7 @@ CREATE TABLE WaitingList
 (
     student VARCHAR(10),
     course VARCHAR(6),
-    position INT NOT NULL,
+    position INT NOT NULL CHECK (position > 0),
     FOREIGN KEY (student) REFERENCES Students(idnr),
     FOREIGN KEY (course) REFERENCES LimitedCourses(code),
     PRIMARY KEY (student, course),
