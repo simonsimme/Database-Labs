@@ -30,11 +30,6 @@ WaitingList
 15    studentIdnr, courseCode -> position
         position, courseCode -> studentIdnr
 
-    
-    
-
-
-
 -- b) BCNF schema --
 
 # REMOVE THESE LINES AND REPLACE IT WITH A SCHEMA IN BCNF
@@ -53,7 +48,7 @@ fd: departmentName         -> departmentAbbreviation
 Table 4 (_courseCode_, departmentAbbreviation, courseName, credits, capacity) 
 fd: courseCode -> departmentAbbreviation, courseName, credits, capacity
 
-table 5 (_courseCode_, _studentIdnr_, grade, position)
+table 5 (_courseCode_, _studentIdnr_, grade, position, classification)
 fd: courseCode, studentIdnr -> grade, position
 
 It removed 2 redundant functional dependencies and is nicely strucured and very much alike our schema from part 1, 
@@ -62,15 +57,13 @@ the only flaw is that table 4 is a combination of Courses and LimitedCourses whi
 
 MVD identified: courseCode ->> classification, a course can have multiple classifications so its independant of the other attributes in table 4
 
-We decompose classification and capacity to its own table:
+We decompose on table 5 so classification to its own table:
 
-Table 4 (_courseCode_, departmentAbbreviation, courseName, credits) 
-fd: courseCode -> departmentAbbreviation, courseName, credits
-
-Table 7 (_courseCode_, classification)
-fd: _courseCode_ -> classification
-
-table 8 (_courseCode_, capacity)
-fd: _coursecode_ -> capacity
+R1(studentIdnr, courseCode, grade, position, classification)
+R2(studentIdnr, courseCode, grade, position) BCNF
+R3(studentIdnr, courseCode, classification)
+* Decompose R3 using `courseCode ->> classification` *
+R4(courseCode, classification)
+R5(studentIdnr, courseCode)
 
 
