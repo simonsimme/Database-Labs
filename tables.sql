@@ -13,7 +13,8 @@ CREATE TABLE Students
     login TEXT NOT NULL,
     program TEXT NOT NULL,
     FOREIGN KEY (program) REFERENCES Program(name),
-    UNIQUE (login)
+    UNIQUE (login),
+    UNIQUE (idnr, program)
 );
 
 
@@ -54,8 +55,8 @@ CREATE TABLE StudentBranches
     branch TEXT,
     program TEXT,
     PRIMARY KEY (student, branch, program),
-    FOREIGN KEY (program, branch) REFERENCES Branches(program, name),
-    FOREIGN KEY (student) REFERENCES Students(idnr),
+    FOREIGN KEY (student, program) REFERENCES Students(idnr, program),
+    FOREIGN KEY (branch, program) REFERENCES Branches(name, program),
     UNIQUE (student, program)   
 );
 
