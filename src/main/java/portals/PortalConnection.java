@@ -7,11 +7,11 @@ public class PortalConnection {
 
     // Set this to e.g. "portal" if you have created a database named portal
     // Leave it blank to use the default database of your database user
-    static final String DBNAME = "";
+    static final String DBNAME = "portal";
     // For connecting to the portal database on your local machine
     static final String DATABASE = "jdbc:postgresql://localhost/"+DBNAME;
     static final String USERNAME = "postgres";
-    static final String PASSWORD = "postgres";
+    static final String PASSWORD = "lbqgvo11";
 
     // This is the JDBC connection object you will be using in your methods.
     private Connection conn;
@@ -33,18 +33,34 @@ public class PortalConnection {
     // Register a student on a course, returns a tiny JSON document (as a String)
     public String register(String student, String courseCode){
       
-      // placeholder, remove along with this comment. 
-      return "{\"success\":false, \"error\":\"Registration is not implemented yet :(\"}";
-      
-      // Here's a bit of useful code, use it or delete it 
-      // } catch (SQLException e) {
-      //    return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
-      // }     
+
+     try(PreparedStatement ps = conn.prepareStatement(
+            "INSERT INTO Registrations (student, course) VALUES (?, ?)"
+            );){
+         ps.setString(1, student);
+         ps.setString(2, courseCode);
+         int r = ps.executeUpdate();
+         return "{\"success\":true, register:\""+student+"\" to course \""+courseCode+"\"}";
+     } catch (SQLException e) {
+          return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
+      }
     }
 
     // Unregister a student from a course, returns a tiny JSON document (as a String)
     public String unregister(String student, String courseCode){
-      return "{\"success\":false, \"error\":\"Unregistration is not implemented yet :(\"}";
+        try(PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM Registrations WHERE student=? AND course=?"
+        )){
+            ps.setString(1, student);
+            ps.setString(2, courseCode);
+
+            int r = ps.executeUpdate();
+            System.out.println("Deleted "+r+" registrations."); //TODO check why r is always 0
+
+            return "{\"success\":true, unregister:\""+student+"\" from course \""+courseCode+"\"}";
+        } catch (SQLException e) {
+            return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
+        }
     }
 
     // Return a JSON document containing lots of information about a student, it should validate against the schema found in information_schema.json

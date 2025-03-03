@@ -21,7 +21,6 @@ public class TestPortal {
          pause();
 
           System.out.println(c.register("2222222222", "CCC333"));
-          System.out.println("test");
           pause();
 
          prettyPrint(c.getInfo("2222222222"));
