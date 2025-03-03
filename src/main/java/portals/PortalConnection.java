@@ -73,18 +73,25 @@ public class PortalConnection {
                 "'branch', branch, " +
                 "'finished', (SELECT jsonb_agg(jsonb_build_object('name', courseName,'course',course,'credits',credits, 'grade', grade)) " +
                 "FROM FinishedCourses WHERE student = ?), " +
-                "'registered', (SELECT jsonb_agg(jsonb_build_object('name',(SELECT name FROM Courses WHERE code = Registrations.course) ,'course', course, 'status', status, 'position', (SELECT position FROM WaitingList WHERE course = Registrations.course))) " +
-                  "FROM Registrations WHERE student = ? )"+
+                "'registered', (SELECT jsonb_agg(jsonb_build_object('name',(SELECT name FROM Courses WHERE code = Registrations.course)" +
+                " ,'course', course, 'status', status, 'position', (SELECT position FROM WaitingList WHERE course = Registrations.course))) " +
+                  "FROM Registrations WHERE student = ? ),"+
+                "'seminarCourses', (SELECT COALESCE(SUM(seminarcount), 0) " +
+                "FROM seminarcourses WHERE studentID = ? ),"+
+                "'totalCredits', (SELECT json_agg(jsonb_build_object('Total passed credits', totalCredits)) " +
+                "FROM totalCredits WHERE student = ? ),"+
+                "'canGraduate', (SELECT json_agg(jsonb_build_object('Qualified for graduation', qualified)) " +
+                "FROM PathToGraduation WHERE student = ? )"+
                 ") AS jsondata " +
                 "FROM BasicInformation WHERE idnr = ?";
         
         try(PreparedStatement st = conn.prepareStatement(
             query
             );){
+            for (int i = 1; i < 7; i++) {
+                st.setString(i, student);
+            }
 
-            st.setString(1, student);
-            st.setString(2, student);
-            st.setString(3, student);
 
 
 
