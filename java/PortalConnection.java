@@ -35,8 +35,7 @@ public class PortalConnection {
       String queryString = "INSERT INTO Registrations VALUES ('" + student + "', '" + courseCode + "')";
       try(PreparedStatement insertQuery = conn.prepareStatement(queryString)) 
       {
-          int rowsAffected = insertQuery.executeUpdate(); 
-          System.out.println(rowsAffected + " row(s) affected.");
+          insertQuery.executeUpdate();
           return "{\"success\":true\"}";
       } catch (SQLException e) 
       {
@@ -51,8 +50,8 @@ public class PortalConnection {
       try (PreparedStatement deleteQuery = conn.prepareStatement(queryString)) 
       {
           int rowsAffected = deleteQuery.executeUpdate();
-          if(rowsAffected == 0) return "Student is not in Registered/WaitingList";
-          return "{\"success\":true\"}";
+          if (rowsAffected == 0) return "{\"success\":false, \"error\":\"Student is not in Registered/WaitingList\"}";
+          return "{\"success\":true}";
       } catch (SQLException e) 
       {
         return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
