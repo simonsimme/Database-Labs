@@ -64,8 +64,37 @@ public class PortalConnection {
         
         try(PreparedStatement st = conn.prepareStatement(
             // replace this with something more useful
-            "SELECT jsonb_build_object('student',idnr,'name',name,'program') AS jsondata FROM BasicInformation WHERE idnr=?"
-            );){
+            "SELECT jsonb_build_object(" +
+                      "'student', b.idnr,"+
+                      "'name', b.name, " +
+                      "'login', (SELECT Students.login FROM Students WHERE Students.idnr = b.idnr), " +
+                      "'program', b.program, " +
+                      "'branch', b.branch, " +
+                      "'finished', COALESCE(( " +
+                              "SELECT jsonb_agg(jsonb_build_object("+
+                                        "'course', f.courseName, " +
+                                        "'code', f.course, " +
+                                        "'credits', f.credits, " +
+                                        "'grade', f.grade " +
+                                        ")) FROM FinishedCourses f WHERE f.student = b.idnr), '[]'::jsonb),"+
+                      "'registered', COALESCE(( " +
+                              "SELECT jsonb_agg(jsonb_build_object(" +
+                                        "'course', Courses.name, " +
+                                        "'code', r.course, " +
+                                        "'status', r.status, " +
+                                        "'position', w.position"+
+                                        ")) FROM Registrations r"+
+                                        " JOIN Courses ON r.course = Courses.code LEFT JOIN WaitingList w ON w.student=r.student WHERE r.student = b.idnr), '[]'::jsonb), " +
+                      "'seminarCourses', COALESCE(( " +
+                              "SELECT s.seminarcount FROM seminarcourses s WHERE s.studentID = b.idnr), 0), " +
+                      "'mathCredits', COALESCE(( " +
+                              "SELECT p.mathCredits FROM PathToGraduation p WHERE p.student = b.idnr), 0), " +
+                      "'totalCredits', COALESCE(( " +
+                              "SELECT p.totalCredits FROM PathToGraduation p WHERE p.student = b.idnr), 0), " +
+                      "'canGraduate', COALESCE(( " +
+                              "SELECT p.qualified FROM PathToGraduation p WHERE p.student = b.idnr), false)" +
+                      ") AS jsondata FROM BasicInformation b WHERE b.idnr = ?");
+                      ){
             
             st.setString(1, student);
             
