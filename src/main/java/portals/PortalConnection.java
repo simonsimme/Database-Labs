@@ -65,14 +65,29 @@ public class PortalConnection {
 
     // Return a JSON document containing lots of information about a student, it should validate against the schema found in information_schema.json
     public String getInfo(String student) throws SQLException{
+        String query = "SELECT jsonb_build_object(" +
+                "'student', idnr, " +
+                "'name', name, " +
+                "'login', login, " +
+                "'program', program, " +
+                "'branch', branch, " +
+                "'finished', (SELECT jsonb_agg(jsonb_build_object('name', courseName,'course',course,'credits',credits, 'grade', grade)) " +
+                "FROM FinishedCourses WHERE student = ?), " +
+                "'registered', (SELECT jsonb_agg(jsonb_build_object('name',(SELECT name FROM Courses WHERE code = Registrations.course) ,'course', course, 'status', status, 'position', (SELECT position FROM WaitingList WHERE course = Registrations.course))) " +
+                  "FROM Registrations WHERE student = ? )"+
+                ") AS jsondata " +
+                "FROM BasicInformation WHERE idnr = ?";
         
         try(PreparedStatement st = conn.prepareStatement(
-            // replace this with something more useful
-            "SELECT jsonb_build_object('student',idnr,'name',name) AS jsondata FROM BasicInformation WHERE idnr=?"
+            query
             );){
-            
+
             st.setString(1, student);
-            
+            st.setString(2, student);
+            st.setString(3, student);
+
+
+
             ResultSet rs = st.executeQuery();
             
             if(rs.next())
