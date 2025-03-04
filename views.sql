@@ -110,7 +110,7 @@ GROUP BY studentID;
 CREATE VIEW seminarcourses AS
 SELECT 
     Taken.student AS studentID,
-    COUNT(Courses.credits) AS seminarcount
+    COALESCE(COUNT(Courses.credits),0) AS seminarcount
 FROM Taken
 INNER JOIN Courses ON Taken.course = Courses.code 
 INNER JOIN PassedCourses ON PassedCourses.student = Taken.student 

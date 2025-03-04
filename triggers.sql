@@ -65,11 +65,11 @@ BEGIN
     IF  max_capacity <= current_capacity THEN
         INSERT INTO WaitingList(student, course, position) VALUES
             (NEW.student, NEW.course, (SELECT COALESCE(MAX(position), 0) + 1 FROM WaitingList WHERE course = NEW.course));
-        RETURN NULL;
+        RETURN NEW;
     ELSE
         INSERT INTO Registered(student, course) VALUES
             (NEW.student, NEW.course);
-        RETURN NULL;
+        RETURN NEW;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -121,6 +121,7 @@ BEGIN
     IF student_is_reg > 0 THEN
      DELETE FROM Registered WHERE student = OLD.student AND course = OLD.course;
      current_capacity = current_capacity -1;
+     RETURN OLD;
      ELSE
         SELECT position INTO removedPosition FROM WaitingList
         WHERE course = leftCourse AND student = OLD.student;
@@ -128,6 +129,7 @@ BEGIN
         UPDATE WaitingList
         SET position = position -1
         WHERE  course = leftCourse AND position > removedPosition;
+        RETURN OLD;
     
     END IF;
        
@@ -146,7 +148,7 @@ BEGIN
         -- Base case: No action needed if no students in waiting list or capacity is full
         RAISE NOTICE 'No action needed';
     END IF;
-    RETURN NULL;
+    RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
 
