@@ -55,9 +55,12 @@ public class PortalConnection {
             ps.setString(2, courseCode);
 
             int r = ps.executeUpdate();
-            System.out.println("Deleted "+r+" registrations."); //TODO check why r is always 0
 
-            return "{\"success\":true, unregister:\""+student+"\" from course \""+courseCode+"\"}";
+             String ret = "Deleted "+r+" registrations.";
+             if(r != 0) {
+                 ret = "{\"success\":true, unregister:\"" + student + "\" from course \"" + courseCode + "\"}";
+             }
+            return ret;
         } catch (SQLException e) {
             return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
         }
