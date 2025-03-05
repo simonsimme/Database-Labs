@@ -76,10 +76,10 @@ public class PortalConnection {
                 "'registered', (SELECT jsonb_agg(jsonb_build_object('name',(SELECT name FROM Courses WHERE code = Registrations.course)" +
                 " ,'course', course, 'status', status, 'position', (SELECT position FROM WaitingList WHERE course = Registrations.course))) " +
                   "FROM Registrations WHERE student = ? ),"+
-                "'seminarCourses', (SELECT COALESCE(SUM(seminarcount), 0) " +
-                "FROM seminarcourses WHERE studentID = ? ),"+
+                "'seminarCourses', (SELECT json_agg(json_build_object('Number of passed seminar courses',seminarcourses)) " +
+                "FROM PathToGraduation WHERE student = ? ),"+
                 "'totalCredits', (SELECT json_agg(jsonb_build_object('Total passed credits', totalCredits)) " +
-                "FROM totalCredits WHERE student = ? ),"+
+                "FROM PathToGraduation WHERE student = ? ),"+
                 "'canGraduate', (SELECT json_agg(jsonb_build_object('Qualified for graduation', qualified)) " +
                 "FROM PathToGraduation WHERE student = ? )"+
                 ") AS jsondata " +
