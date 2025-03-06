@@ -7,8 +7,16 @@ SELECT
     Students.name,
     Students.login,
     Students.program,
-    StudentBranches.branch
+    NULL AS branch
 FROM Students
+UNION ALL
+SELECT
+    Students.idnr,
+    Students.name,
+    Students.login,
+    Students.program,
+    StudentBranches.branch
+    FROM Students
 INNER JOIN StudentBranches ON Students.idnr = StudentBranches.student;
 
 -- Helper function for FinishedCourses, returns (Students, course, credits)

@@ -121,15 +121,15 @@ BEGIN
     IF student_is_reg > 0 THEN
      DELETE FROM Registered WHERE student = OLD.student AND course = OLD.course;
      current_capacity = current_capacity -1;
-     RETURN OLD;
-     ELSE
+    -- RETURN OLD;
+    ELSE
         SELECT position INTO removedPosition FROM WaitingList
         WHERE course = leftCourse AND student = OLD.student;
         DELETE FROM WaitingList WHERE course = leftCourse AND student = OLD.student;
         UPDATE WaitingList
         SET position = position -1
         WHERE  course = leftCourse AND position > removedPosition;
-        RETURN OLD;
+       -- RETURN OLD;
     
     END IF;
        
