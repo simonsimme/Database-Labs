@@ -47,51 +47,72 @@ public class PortalConnection {
     }
 
     // Unregister a student from a course, returns a tiny JSON document (as a String)
-    public String unregister(String student, String courseCode){
-        try(PreparedStatement ps = conn.prepareStatement(
-                "DELETE FROM Registrations WHERE student=? AND course=?"
-        )){
-            ps.setString(1, student);
-            ps.setString(2, courseCode);
-
+    public String unregister(String student, String courseCode) {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM Registrations WHERE student = '" + student + "' AND course = '" + courseCode + "'"
+        )) {
             int r = ps.executeUpdate();
-
-             String ret = "Deleted "+r+" registrations.";
-             if(r != 0) {
-                 ret = "{\"success\":true, unregister:\"" + student + "\" from course \"" + courseCode + "\"}";
-             }
+            String ret = "Deleted " + r + " registrations.";
+            if (r != 0) {
+                ret = "{\"success\":true, unregister:\"" + student + "\" from course \"" + courseCode + "\"}";
+            }
             return ret;
         } catch (SQLException e) {
-            return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
+            return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
         }
     }
 
     // Return a JSON document containing lots of information about a student, it should validate against the schema found in information_schema.json
     public String getInfo(String student) throws SQLException{
-        String query = "SELECT jsonb_build_object(" +
-                "'student', idnr, " +
-                "'name', name, " +
-                "'login', login, " +
-                "'program', program, " +
-                "'branch', branch, " +
-                "'finished', (SELECT jsonb_agg(jsonb_build_object('name', courseName,'course',course,'credits',credits, 'grade', grade)) " +
-                "FROM FinishedCourses WHERE student = ?), " +
-                "'registered', (SELECT jsonb_agg(jsonb_build_object('name',(SELECT name FROM Courses WHERE code = Registrations.course)" +
-                " ,'course', course, 'status', status, 'position', (SELECT position FROM WaitingList WHERE course = Registrations.course))) " +
-                  "FROM Registrations WHERE student = ? ),"+
-                "'seminarCourses', (SELECT json_agg(json_build_object('Number of passed seminar courses',seminarcourses)) " +
-                "FROM PathToGraduation WHERE student = ? ),"+
-                "'totalCredits', (SELECT json_agg(jsonb_build_object('Total passed credits', totalCredits)) " +
-                "FROM PathToGraduation WHERE student = ? ),"+
-                "'canGraduate', (SELECT json_agg(jsonb_build_object('Qualified for graduation', qualified)) " +
-                "FROM PathToGraduation WHERE student = ? )"+
-                ") AS jsondata " +
-                "FROM BasicInformation WHERE idnr = ?";
+        String query = "SELECT jsonb_build_object("
+                + "'student', idnr, "
+                + "'name', name, "
+                + "'login', login, "
+                + "'program', program, "
+                + "'branch', branch, "
+                + "'finished', ("
+                + "    SELECT jsonb_agg(jsonb_build_object("
+                + "        'course', courseName, "
+                + "        'code', course, "
+                + "        'credits', credits, "
+                + "        'grade', grade"
+                + "    )) FROM FinishedCourses WHERE student = ?"
+                + "), "
+                + "'registered', ("
+                + "    SELECT jsonb_agg(jsonb_build_object("
+                + "        'course', name, "
+                + "        'code', course, "
+                + "        'status', status"
+                + "    )) FROM ("
+                + "        SELECT c.name, r.course, r.status "
+                + "        FROM Registrations r "
+                + "        JOIN Courses c ON r.course = c.code "
+                + "        WHERE r.student = ?"
+                + "    ) AS subquery"
+                + "), "
+                + "'seminarCourses', ("
+                + "    SELECT seminarcourses "
+                + "    FROM PathToGraduation WHERE student = ?"
+                + "), "
+                + "'mathCredits', ("
+                + "    SELECT mathCredits "
+                + "    FROM PathToGraduation WHERE student = ?"
+                + "), "
+                + "'totalCredits', ("
+                + "    SELECT totalCredits "
+                + "    FROM PathToGraduation WHERE student = ?"
+                + "), "
+                + "'canGraduate', ("
+                + "    SELECT qualified "
+                + "    FROM PathToGraduation WHERE student = ?"
+                + ") "
+                + ") AS jsondata "
+                + "FROM BasicInformation WHERE idnr = ?;";
         
         try(PreparedStatement st = conn.prepareStatement(
             query
             );){
-            for (int i = 1; i < 7; i++) {
+            for (int i = 1; i <= 7; i++) {
                 st.setString(i, student);
             }
 
@@ -103,9 +124,11 @@ public class PortalConnection {
             if(rs.next())
               return rs.getString("jsondata");
             else
-              return "{\"student\":\"does not exist :(\"}"; 
+              return "{\"student\":\"does not exist :(\"}";
             
-        } 
+        } catch (SQLException e) {
+            return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
+        }
     }
 
     // This is a hack to turn an SQLException into a JSON string error message. No need to change.

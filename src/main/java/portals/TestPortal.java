@@ -15,58 +15,60 @@ public class TestPortal {
          // Use println instead of prettyPrint to get more compact output (if your raw JSON is already readable)
 
 
-         prettyPrint(c.getInfo("2222222222")); 
-         pause();
+         prettyPrint(c.getInfo("2222222222"));
+          // pause();
 
           System.out.println(c.register("2222222222", "CCC111"));
-          pause();
+          //pause();
           System.out.println(c.register("2222222222", "CCC111")); //ERROR already in //wokred
-          pause();
+          // pause();
 
 
           prettyPrint(c.getInfo("2222222222"));
-          pause();
+          // pause();
 
           //System.out.println(c.register("2222222222", "CCC333")); // ERROR
           //pause();
           System.out.println(c.unregister("2222222222", "CCC111"));
-          pause();
+          //pause();
           System.out.println(c.unregister("2222222222", "CCC111")); // ERROR // wokred
-          pause();
+          //pause();
           prettyPrint(c.getInfo("2222222222"));
-          pause();
+         // pause();
 
 
           System.out.println(c.register("2222222222", "CCC444")); // ERROR // wokred
-          pause();
+          //pause();
 
           System.out.println(c.register("1111111111", "CCC222"));
-          System.out.println(c.register("2222222222", "CCC222")); // makes que of two students 2 and 1
+          System.out.println(c.register("6666666666", "CCC222"));
+          System.out.println(c.register("2222222222", "CCC222")); // makes que of two students 2 and 1, (6)
 
-          pause();
+         // pause();
 
 
-          System.out.println(c.unregister("6666666666", "CCC222")); // removes from qued course
-          pause();
-          prettyPrint(c.getInfo("6666666666"));
-          pause();
 
-          System.out.println(c.register("6666666666", "CCC222")); // placed last in que
-          pause();
-          prettyPrint(c.getInfo("6666666666"));
-          pause();
+          System.out.println(c.unregister("1111111111", "CCC222"));
+          prettyPrint(c.getInfo("1111111111"));
+         // pause();
+
+          System.out.println(c.register("1111111111", "CCC222")); // placed last in que
+          //pause();
+          prettyPrint(c.getInfo("1111111111")); // WORKED
+         // pause();
 
           //overfill 3 students in c333 and one in waiting
-          System.out.println(c.register("2222222222", "CCC333")); // adds waiting
-          pause();
-          prettyPrint(c.getInfo("2222222222")); // waiting
-          pause();
-          System.out.println(c.unregister("6666666666", "CCC333"));
-          pause();
-          prettyPrint(c.getInfo("2222222222")); // should still be in waiting
-          pause();
+          System.out.println(c.register("5555555555", "CCC333")); // adds waiting
+        //  pause();
+          prettyPrint(c.getInfo("5555555555")); // waiting
+         // pause();
+          System.out.println(c.unregister("3333333333", "CCC333"));
+          //pause();
+          prettyPrint(c.getInfo("5555555555")); // should still be in waiting
+        //  pause();
 
           // injection attack
+            System.out.println(c.unregister("1111111111", "CCC333'; DROP VIEW Registrations CASCADE; --"));
 
 
 
