@@ -129,7 +129,7 @@ BEGIN
         UPDATE WaitingList
         SET position = position -1
         WHERE  course = leftCourse AND position > removedPosition;
-       -- RETURN OLD;
+        RETURN OLD;
     
     END IF;
        
