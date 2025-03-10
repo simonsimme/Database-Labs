@@ -31,35 +31,36 @@ public class PortalConnection {
 
 
     // Register a student on a course, returns a tiny JSON document (as a String)
-    public String register(String student, String courseCode){
-      
-
-     try(PreparedStatement ps = conn.prepareStatement(
-            "INSERT INTO Registrations (student, course) VALUES (?, ?)"
-            );){
-         ps.setString(1, student);
-         ps.setString(2, courseCode);
-         int r = ps.executeUpdate();
-         return "{\"success\":true, register:\""+student+"\" to course \""+courseCode+"\"}";
-     } catch (SQLException e) {
-          return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
-      }
+    public String register(String student, String courseCode) {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO Registrations (student, course) VALUES (?, ?)"
+        )) {
+            ps.setString(1, student);
+            ps.setString(2, courseCode);
+            int r = ps.executeUpdate();
+            return "{\"success\":true, \"register\":\"" + escapeString(student) + "\", \"course\":\"" + escapeString(courseCode) + "\"}";
+        } catch (SQLException e) {
+            return "{\"success\":false, \"error\":\"" + escapeString(getError(e)) + "\"}";
+        }
     }
 
     // Unregister a student from a course, returns a tiny JSON document (as a String)
     public String unregister(String student, String courseCode) {
-        try (PreparedStatement ps = conn.prepareStatement(
-                "DELETE FROM Registrations WHERE student = '" + student + "' AND course = '" + courseCode + "'"
-        )) {
-            int r = ps.executeUpdate();
-            String ret = "Deleted " + r + " registrations.";
+        String query = "DELETE FROM Registrations WHERE student = '" + escapeString(student) + "' AND course = '" + escapeString(courseCode) + "'";
+        try (Statement stmt = conn.createStatement()) {
+            int r = stmt.executeUpdate(query);
             if (r != 0) {
-                ret = "{\"success\":true, unregister:\"" + student + "\" from course \"" + courseCode + "\"}";
+                return "{\"success\":true, \"unregister\":\"" + escapeString(student) + "\", \"course\":\"" + escapeString(courseCode) + "\"}";
+            } else {
+                return "{\"success\":false, \"error\":\"No registration found\"}";
             }
-            return ret;
         } catch (SQLException e) {
-            return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
+            return "{\"success\":false, \"error\":\"" + escapeString(getError(e)) + "\"}";
         }
+    }
+
+    private String escapeString(String input) {
+        return input.replace("'", "''");
     }
 
     // Return a JSON document containing lots of information about a student, it should validate against the schema found in information_schema.json
