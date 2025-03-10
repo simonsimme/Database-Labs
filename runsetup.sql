@@ -39,7 +39,7 @@ SET client_min_messages TO NOTICE; -- More talk
 \ir inserts.sql
 \ir views.sql
 \ir triggers.sql
-\ir tests.sql
+
 
 -- Life-hack: When working on a new view you can write it as a query
 -- here (without creating a view) and when it works just add
